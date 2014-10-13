@@ -1,4 +1,7 @@
-# Reactor 网络模块文档
+# Reactor 模块文档
+##
+- 本代码用于演示一个Reactor模型的raw工作模型
+
 ## 整体结构
 - 多路复用 (epoll 模块)
 - 事件驱动 (事件封装)
@@ -16,7 +19,7 @@
 
 ## 详细介绍
 ### **1. 多路复用**
-
+```
     struct eventOps {
         char *name;
         int32_t (*init)(void);
@@ -33,6 +36,7 @@
         &epoll_del,
         &epoll_run
     };
+```
 
 >  通过此结构(interface),将epoll操作与系统实际的模块隔离,底层可以使用SELECT或者KQUEUE
 其他模块通过以下方式导入IO多路复用模块，将耦合点聚拢在接口处。接口供上层event调用
@@ -49,6 +53,7 @@
 > Reactor是一个全局的结构，是所有event的归属。
 事件驱动模块提供了以下几个接口供buffer层调用
 
+```
     int32_t eventSelfInit(struct event *_ev,   \
                       int32_t      fd,     \
                       int32_t      mode,   \
@@ -102,10 +107,11 @@
     /*
         Destroy a reactor
     */
-
+```
 ### **3.缓冲管理**
 > 通过层次化的设计，将上述三个模块隔离开，最终在buffer层导出以下几个接口
 
+```
     struct buffer * createBuffer(struct reactor * _R, int32_t socket);
     /*
         create a buffer object, with a socket you which you want to 
@@ -147,6 +153,7 @@
     
     
     void disBuffer(struct buffer * _B);
+```
 
 >使用场景：每次有连接请求到来的时候，Accept连接后创建一个buffer结构，用于管理此连接的数据收发操作。
 其中buffer提供了write 和 两种读的方式
